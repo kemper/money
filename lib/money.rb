@@ -8,7 +8,7 @@ class Money
   def_delegator :value, :hash
 
   def initialize value
-    string_value = strip_dollar_sign value
+    string_value = strip_dollar_sign value.to_s
     raise ArgumentError.new("creation of Money failed with #{value.inspect}") unless is_numeric?(string_value)
     @value = BigDecimal.new(string_value).round(2)
   end
@@ -36,7 +36,7 @@ class Money
   protected
 
   def strip_dollar_sign value
-    value.to_s.start_with?("$") ? value.to_s.sub("$", "") : value.to_s
+    value.start_with?("$") ? value.sub("$", "") : value
   end
 
   def is_numeric? value
