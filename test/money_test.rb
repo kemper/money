@@ -30,11 +30,6 @@ class MoneyTest < Test::Unit::TestCase
     assert_equal 1, Set.new([money1, money2]).size
   end
 
-  def test_money_created_with_nil_should_be_zero
-    money = Money.new nil
-    assert_equal Money.new("0"), money
-  end
-
   def test_should_round_to_nearest_cent
     money = Money.new "10.123"
     assert_equal Money.new("10.12"), money
@@ -61,13 +56,14 @@ class MoneyTest < Test::Unit::TestCase
   end
 
   def test_money_creating_with_invalid_money_values_results_in_zero_money
-    zero = Money.new "0.0"
-    assert_equal zero, Money.new("asdf")
-    assert_equal zero, Money.new("5$.0")
-    assert_equal zero, Money.new("#5.0")
-    assert_equal zero, Money.new("5.0%")
-    assert_equal zero, Money.new("5.0x")
-    assert_equal zero, Money.new("0xA")
+    assert_raises(ArgumentError) { Money.new(nil) }
+    assert_raises(ArgumentError) { Money.new("") }
+    assert_raises(ArgumentError) { Money.new("asdf") }
+    assert_raises(ArgumentError) { Money.new("5$.0") }
+    assert_raises(ArgumentError) { Money.new("#5.0") }
+    assert_raises(ArgumentError) { Money.new("5.0%") }
+    assert_raises(ArgumentError) { Money.new("5.0x") }
+    assert_raises(ArgumentError) { Money.new("0xA") }
   end
 
   def test_adding_money
@@ -91,6 +87,31 @@ class MoneyTest < Test::Unit::TestCase
     assert_equal Money.new("0.0"), Money.new(".25") - Money.new(".25")
     assert_equal Money.new("3.03"), Money.new("5.05") - Money.new("2.02")
     assert_equal Money.new("-7.07"), Money.new("-5.05") - Money.new("2.02")
+  end
+
+  def test_comparing_money
+    assert Money.new("2") > Money.new("1")
+    assert Money.new("2") >= Money.new("2")
+    assert Money.new("1") < Money.new("2")
+    assert Money.new("1") <= Money.new("2")
+  end
+
+  def test_comparing_money_to_non_money_object_raises_argument_exception
+    assert_raises ArgumentError do
+      Money.new(1) < nil
+    end
+  end
+
+  def test_adding_money_with_non_money_object_raises_argument_error
+    assert_raises ArgumentError do
+      Money.new(1) + nil
+    end
+  end
+
+  def test_subtracting_money_with_non_money_object_raises_argument_error
+    assert_raises ArgumentError do
+      Money.new(1) - nil
+    end
   end
 
 end
